@@ -20,12 +20,19 @@ thread_id = 12494
 k = 0
 db = SqliteDatabase('fof.sqlite')
 
+
 def randomfr(username):
-    lista = [f'👍 @{username}, твой лимит восстановлен – запрашивай токены снова.',f'✨ @{username}, лимит пополнен, можешь снова брать токены.',f'✅ @{username}, лимит обновлён, жми на запрос токенов.',f'🚀 @{username}, лимит восстановлен – пора за новыми токенами!',f'🎉 @{username}, лимит токенов вернулся, запроси их прямо сейчас.']
+    lista = [f'👍 @{username}, твой лимит восстановлен – запрашивай токены снова.',
+             f'✨ @{username}, лимит пополнен, можешь снова брать токены.',
+             f'✅ @{username}, лимит обновлён, жми на запрос токенов.',
+             f'🚀 @{username}, лимит восстановлен – пора за новыми токенами!',
+             f'🎉 @{username}, лимит токенов вернулся, запроси их прямо сейчас.']
     return lista[random.randrange(0, len(lista))]
+
 
 def web3(address):
     return str(Web3.to_checksum_address(address))
+
 
 class MoonveilFaucet:
     def __init__(
@@ -64,31 +71,44 @@ class MoonveilFaucet:
         return request["msg"]
 
 
-
-
 class research:
     def reserch_user(userId):
         for user in Person.select().where(Person.userId == userId):
             return user.point
 
+    def reserch_user2(userId):
+        for user in SecondSeason.select().where(SecondSeason.userId == userId):
+            return user.point
+
     def nextdata(userId):
-        for user in Person.select().where(Person.userId == userId):
+        for user in SecondSeason.select().where(SecondSeason.userId == userId):
             return user.nextsend
 
     def delandcreat(userId):
-        point = research.reserch_user(userId)
-        obj = Person.get(Person.userId == userId)
+        point1 = research.reserch_user(userId)
+        point2 = research.reserch_user2(userId)
+        obj = SecondSeason.get(SecondSeason.userId == userId)
         obj.delete_instance()
-        Person.create(userId=userId, lastsend=calendar.timegm(time.gmtime()),
-                                  nextsend=calendar.timegm(time.gmtime()) + 86400, point=point+1)
+        SecondSeason.create(userId=userId, lastsend=calendar.timegm(time.gmtime()),
+                      nextsend=calendar.timegm(time.gmtime()) + 86400, point1=point1, point2=point2+1)
 
     def povrors(userId):
         h = []
-        for person in Person.select().where(Person.userId==userId):
+        for person in SecondSeason.select().where(SecondSeason.userId == userId):
             h.append(person.userId)
             if len(h) > 1:
-                obj = Person.get(Person.userId == userId)
+                obj = SecondSeason.get(SecondSeason.userId == userId)
                 obj.delete_instance()
+
+    def firstseason(userId):
+        for person in Person.select().where(Person.userId == userId):
+            if person!=None:
+                point1 = person.point
+                SecondSeason.create(userId=userId, lastsend=calendar.timegm(time.gmtime()),
+                      nextsend=calendar.timegm(time.gmtime()) + 86400, point1=point1, point2=1)
+            else:
+                SecondSeason.create(userId=userId, lastsend=calendar.timegm(time.gmtime()),
+                      nextsend=calendar.timegm(time.gmtime()) + 86400, point1=0, point2=1)
 
 
 class Person(Model):
@@ -96,6 +116,7 @@ class Person(Model):
     lastsend = IntegerField()
     nextsend = IntegerField()
     point = IntegerField()
+
     class Meta:
         database = db
 
@@ -104,6 +125,16 @@ class Timeframe(Model):
     lastsend = IntegerField()
     nextsend = IntegerField()
     userId = IntegerField()
+
+    class Meta:
+        database = db
+
+class SecondSeason(Model):
+    userId = IntegerField()
+    lastsend = IntegerField()
+    nextsend = IntegerField()
+    point1 = IntegerField()
+    point2 = IntegerField()
     class Meta:
         database = db
 
@@ -111,27 +142,28 @@ class Timeframe(Model):
 def leaderboard1(message):
     f = ''
     chat_id = message.chat.id
-    k=0
+    k = 0
     after = 0
     undo = []
-    for person in Person.select(Person).order_by(Person.point.desc()):
-        k+=1
+    for person in SecondSeason.select(SecondSeason).order_by(SecondSeason.point2.desc()):
+        k += 1
         userId = person.userId
         UsrInfo = root.get_chat_member(chat_id, userId).user.username
-        undo.append(person.point)
-        if k>=11 and undo[k-1] != undo[k-2]:
+        undo.append(person.point2)
+        if k >= 11 and undo[k - 1] != undo[k - 2]:
             break
-        if k>=11 and undo[k-1] == undo[k-2]:
+        if k >= 11 and undo[k - 1] == undo[k - 2]:
             kol = person.point
-            after +=1
+            after += 1
             continue
-        f= f+ str(k)+ f'. @{UsrInfo} — ' +str(person.point) + ' запрос.\n'
+        f = f + str(k) + f'. @{UsrInfo} — ' + str(person.point2) + ' запрос.\n'
 
     if after != 0:
-        f+= f'+{str(after)} пользователей с {kol} запросами'
+        f += f'+{str(after)} пользователей с {kol} запросами'
         return f
     else:
         return f
+
 
 def print_numbers():
     while True:
@@ -153,7 +185,7 @@ thread.start()
 
 file = open('proxys')
 prox = file.readline()
-db.create_tables([Person, Timeframe])
+db.create_tables([Person, Timeframe, SecondSeason])
 
 
 @root.message_handler(commands=['leaderboard'])
@@ -163,6 +195,7 @@ def leaderboard2(message):
         root.reply_to(message, f'🔥<b>Таблица лидеров:</b>\n{h}', parse_mode='HTML')
     except Exception as e:
         print(e)
+
 
 @root.message_handler(content_types=['text'])
 def address(message):
@@ -179,14 +212,15 @@ def address(message):
             more = result.classic()
             if more != 'invalid address':
                 if more.split()[0] == "Txhash:":
-                    print(research.reserch_user(message_id))
-                    if research.reserch_user(message_id) == None:
-                        Person.create(userId=int(message_id), lastsend=calendar.timegm(time.gmtime()),
-                                      nextsend=calendar.timegm(time.gmtime()) + 86400, point=1)
+                    print(research.reserch_user2(message_id))
+                    if research.reserch_user2(message_id) == None:
+                        research.firstseason(message_id)
                         Timeframe.create(lastsend=calendar.timegm(time.gmtime()),
                                          nextsend=calendar.timegm(time.gmtime()) + 86400, userId=int(message_id))
                         research.povrors(message_id)
-                        root.reply_to(message, f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Запросов: {str(research.reserch_user(message_id))}</b>", parse_mode='HTML')
+                        root.reply_to(message,
+                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый:{str(research.reserch_user(message_id))} запросов\n2⃣ Второй:{str(research.reserch_user2(message_id))}",
+                                      parse_mode='HTML')
                         break
                     else:
                         if research.nextdata(message_id) <= calendar.timegm(time.gmtime()):
@@ -195,31 +229,35 @@ def address(message):
                             Timeframe.create(lastsend=calendar.timegm(time.gmtime()),
                                              nextsend=calendar.timegm(time.gmtime()) + 86400, userId=int(message_id))
                             root.reply_to(message,
-                                          f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Запросов: {str(research.reserch_user(message_id))}</b>", parse_mode='HTML')
+                                          f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый:{str(research.reserch_user(message_id))} запросов\n2⃣ Второй:{str(research.reserch_user2(message_id))}",
+                                          parse_mode='HTML')
                             break
                         else:
                             research.povrors(message_id)
                             root.reply_to(message,
-                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Запросов: {str(research.reserch_user(message_id))}</b>", parse_mode='HTML')
+                                          f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый:{str(research.reserch_user(message_id))} запросов\n2⃣ Второй:{str(research.reserch_user2(message_id))}",
+                                          parse_mode='HTML')
                             break
                 if more.split()[0] != "Txhash":
                     continue
         if more != 'invalid address':
             if more.split()[0] == "Txhash:":
                 pass
-            
+
             elif more.split()[0] == "You":
                 otvet = re.findall(r'\d+', more.split()[8])
                 if len(otvet) == 3:
                     root.reply_to(message,
-                                  f"🤷‍♂️ Cегодня вы уже запрашивали токены, пожалуйста вернитесь через <b>{otvet[0]}</b> часа <b>{otvet[1]}</b> минут и заново их запросите.", parse_mode='HTML')
+                                  f"🤷‍♂️ Cегодня вы уже запрашивали токены, пожалуйста вернитесь через <b>{otvet[0]}</b> часа <b>{otvet[1]}</b> минут и заново их запросите.",
+                                  parse_mode='HTML')
                 else:
                     root.reply_to(message,
-                                  f"🤷‍♂️ Cегодня вы уже запрашивали токены, пожалуйста вернитесь через <b>{otvet[0]}</b> минут и заново их запросите.", parse_mode='HTML')
-    
+                                  f"🤷‍♂️ Cегодня вы уже запрашивали токены, пожалуйста вернитесь через <b>{otvet[0]}</b> минут и заново их запросите.",
+                                  parse_mode='HTML')
+
             elif more.split()[0] == "Request":
                 pass
-    
+
             else:
                 root.reply_to(message, f"🙅‍♂️ <b>Ошибка крана, повторите позже!</b>", parse_mode='HTML')
         else:
@@ -227,10 +265,6 @@ def address(message):
 
     except Exception as e:
         print(e)
-
-
-
-
 
 
 root.infinity_polling(none_stop=True)
