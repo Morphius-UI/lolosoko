@@ -78,7 +78,7 @@ class research:
 
     def reserch_user2(userId):
         for user in SecondSeason.select().where(SecondSeason.userId == userId):
-            return user.point
+            return user.point2
 
     def nextdata(userId):
         for user in SecondSeason.select().where(SecondSeason.userId == userId):
@@ -102,13 +102,7 @@ class research:
 
     def firstseason(userId):
         for person in Person.select().where(Person.userId == userId):
-            if person!=None:
-                point1 = person.point
-                SecondSeason.create(userId=userId, lastsend=calendar.timegm(time.gmtime()),
-                      nextsend=calendar.timegm(time.gmtime()) + 86400, point1=point1, point2=1)
-            else:
-                SecondSeason.create(userId=userId, lastsend=calendar.timegm(time.gmtime()),
-                      nextsend=calendar.timegm(time.gmtime()) + 86400, point1=0, point2=1)
+            return person.point
 
 
 class Person(Model):
@@ -153,7 +147,7 @@ def leaderboard1(message):
         if k >= 11 and undo[k - 1] != undo[k - 2]:
             break
         if k >= 11 and undo[k - 1] == undo[k - 2]:
-            kol = person.point
+            kol = person.point2
             after += 1
             continue
         f = f + str(k) + f'. @{UsrInfo} — ' + str(person.point2) + ' запрос.\n'
@@ -207,20 +201,34 @@ def address(message):
         print(message_id)
         address = message.text
         trueadd = web3(str(address))
-        for i in range(3):
+        for i in range(4):
             result = MoonveilFaucet(proxy=prox, address=trueadd)
             more = result.classic()
             if more != 'invalid address':
                 if more.split()[0] == "Txhash:":
                     print(research.reserch_user2(message_id))
                     if research.reserch_user2(message_id) == None:
-                        research.firstseason(message_id)
+                        g = research.firstseason(message_id)
+                        if g!=None:
+                            point1 = g
+                            SecondSeason.create(userId=message_id, lastsend=calendar.timegm(time.gmtime()),
+                                     nextsend=calendar.timegm(time.gmtime()) + 86400, point1=point1, point2=1)
+                        else:
+                            print("sosososososososososososo")
+                            SecondSeason.create(userId=message_id, lastsend=calendar.timegm(time.gmtime()),
+                                     nextsend=calendar.timegm(time.gmtime()) + 86400, point1=0, point2=1)
                         Timeframe.create(lastsend=calendar.timegm(time.gmtime()),
                                          nextsend=calendar.timegm(time.gmtime()) + 86400, userId=int(message_id))
                         research.povrors(message_id)
-                        root.reply_to(message,
-                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый:{str(research.reserch_user(message_id))} запросов\n2⃣ Второй:{str(research.reserch_user2(message_id))}",
+                        if g != None:
+                            root.reply_to(message,
+                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос\n\n<b>🎁 Первый сезон завершён!</b> <a href='https://t.me/moonveil_workshop/12494/21253'>Заберите награду до 24.03»</a>",
                                       parse_mode='HTML')
+                        else:
+                            root.reply_to(message,
+                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: 0 запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
+                                      parse_mode='HTML')
+
                         break
                     else:
                         if research.nextdata(message_id) <= calendar.timegm(time.gmtime()):
@@ -228,15 +236,30 @@ def address(message):
                             research.povrors(message_id)
                             Timeframe.create(lastsend=calendar.timegm(time.gmtime()),
                                              nextsend=calendar.timegm(time.gmtime()) + 86400, userId=int(message_id))
-                            root.reply_to(message,
-                                          f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый:{str(research.reserch_user(message_id))} запросов\n2⃣ Второй:{str(research.reserch_user2(message_id))}",
-                                          parse_mode='HTML')
+                            if research.reserch_user(message_id) != None:
+                                root.reply_to(message,
+                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос\n\n<b>🎁 Первый сезон завершён!</b> <a href='https://t.me/moonveil_workshop/12494/21253'>Заберите награду до 24.03 »</a>",
+                                      parse_mode='HTML')
+                            else:
+                                root.reply_to(message,
+                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: 0 запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
+                                      parse_mode='HTML')
+
+
+
                             break
                         else:
                             research.povrors(message_id)
-                            root.reply_to(message,
-                                          f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый:{str(research.reserch_user(message_id))} запросов\n2⃣ Второй:{str(research.reserch_user2(message_id))}",
-                                          parse_mode='HTML')
+                            if research.reserch_user(message_id) != None:
+                                root.reply_to(message,
+                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос\n\n<b>🎁 Первый сезон завершён!</b> <a href='https://t.me/moonveil_workshop/12494/21253'>Заберите награду до 24.03 »</a>",
+                                      parse_mode='HTML')
+                            else:
+                                root.reply_to(message,
+                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: 0 запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
+                                      parse_mode='HTML')
+
+
                             break
                 if more.split()[0] != "Txhash":
                     continue
