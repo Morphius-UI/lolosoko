@@ -221,21 +221,19 @@ def address(message):
                             point1 = g
                             SecondSeason.create(userId=message_id, lastsend=calendar.timegm(time.gmtime()),
                                      nextsend=calendar.timegm(time.gmtime()) + 86400, point1=point1, point2=1)
-                        else:
-                            print("sosososososososososososo")
-                            SecondSeason.create(userId=message_id, lastsend=calendar.timegm(time.gmtime()),
-                                     nextsend=calendar.timegm(time.gmtime()) + 86400, point1=0, point2=1)
-                        Timeframe.create(lastsend=calendar.timegm(time.gmtime()),
-                                         nextsend=calendar.timegm(time.gmtime()) + 86400, userId=int(message_id))
-                        
-                        if g != None:
                             root.reply_to(message,
                                       f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос\n\n<b>🎁 Первый сезон завершён!</b> <a href='https://t.me/moonveil_workshop/12494/21253'>Заберите награду до 24.03»</a>",
                                       parse_mode='HTML')
                         else:
+                            SecondSeason.create(userId=message_id, lastsend=calendar.timegm(time.gmtime()),
+                                     nextsend=calendar.timegm(time.gmtime()) + 86400, point1=0, point2=1)
                             root.reply_to(message,
                                       f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: 0 запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
                                       parse_mode='HTML')
+                            
+                        Timeframe.create(lastsend=calendar.timegm(time.gmtime()),
+                                         nextsend=calendar.timegm(time.gmtime()) + 86400, userId=int(message_id))
+
 
                         break
                     else:
