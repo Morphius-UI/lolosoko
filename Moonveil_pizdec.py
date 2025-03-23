@@ -18,7 +18,7 @@ chat = -1002364115755
 thread_id = 12494
 
 k = 0
-db = SqliteDatabase('fof.sqlite')
+db = SqliteDatabase('fofa.sqlite')
 
 
 def randomfr(username):
@@ -87,10 +87,20 @@ class research:
     def delandcreat(userId):
         point1 = research.reserch_user(userId)
         point2 = research.reserch_user2(userId)
+        print(point1, point2)
         obj = SecondSeason.get(SecondSeason.userId == userId)
-        obj.delete_instance()
-        SecondSeason.create(userId=userId, lastsend=calendar.timegm(time.gmtime()),
+        print(obj)
+        if obj != None:
+            print("afafaf")
+            obj.delete_instance()
+            SecondSeason.create(userId=userId, lastsend=calendar.timegm(time.gmtime()),
                       nextsend=calendar.timegm(time.gmtime()) + 86400, point1=point1, point2=point2+1)
+        else:
+            print('sex')
+            SecondSeason.create(userId=userId, lastsend=calendar.timegm(time.gmtime()),
+                      nextsend=calendar.timegm(time.gmtime()) + 86400, point1=point1, point2=point2+1)
+
+
 
     def povrors(userId):
         h = []
@@ -139,7 +149,7 @@ def leaderboard1(message):
     k = 0
     after = 0
     undo = []
-    for person in SecondSeason.select(SecondSeason).order_by(SecondSeason.point2.desc()):
+    for person in SecondSeason.select().order_by(SecondSeason.point2.desc()):
         k += 1
         userId = person.userId
         UsrInfo = root.get_chat_member(chat_id, userId).user.username
@@ -163,8 +173,6 @@ def print_numbers():
     while True:
         for user in Timeframe.select():
             userId = user.userId
-            print(user.nextsend)
-            print(calendar.timegm(time.gmtime()))
             if user.nextsend <= calendar.timegm(time.gmtime()):
                 UsrInfo = root.get_chat_member(userId, userId).user.username
                 text = randomfr(UsrInfo)
@@ -197,7 +205,7 @@ def address(message):
         global chat_id
         chat_id = message.chat.id
         print(chat_id)
-        message_id = message.from_user.id
+        message_id = int(message.from_user.id)
         print(message_id)
         address = message.text
         trueadd = web3(str(address))
@@ -219,7 +227,7 @@ def address(message):
                                      nextsend=calendar.timegm(time.gmtime()) + 86400, point1=0, point2=1)
                         Timeframe.create(lastsend=calendar.timegm(time.gmtime()),
                                          nextsend=calendar.timegm(time.gmtime()) + 86400, userId=int(message_id))
-                        research.povrors(message_id)
+                        
                         if g != None:
                             root.reply_to(message,
                                       f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос\n\n<b>🎁 Первый сезон завершён!</b> <a href='https://t.me/moonveil_workshop/12494/21253'>Заберите награду до 24.03»</a>",
@@ -249,7 +257,7 @@ def address(message):
 
                             break
                         else:
-                            research.povrors(message_id)
+                            
                             if research.reserch_user(message_id) != None:
                                 root.reply_to(message,
                                       f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос\n\n<b>🎁 Первый сезон завершён!</b> <a href='https://t.me/moonveil_workshop/12494/21253'>Заберите награду до 24.03 »</a>",
