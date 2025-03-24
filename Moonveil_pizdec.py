@@ -143,7 +143,7 @@ class SecondSeason(Model):
         database = db
 
 
-'''def profile1(message):
+def profile1(message):
     get_user_id = message.from_user.id
     for time in SecondSeason.select().where(SecondSeason.userId == get_user_id):
         user_next_send = time.nextsend
@@ -153,13 +153,15 @@ class SecondSeason(Model):
          whole_second = user_next_send - time_now
          if whole_second > 0:
             time_now = datetime.timedelta(whole_second)
+            time_hours = time_now.split(':')[0]
+            time_minutes = time_now.split(':')[1]
 
 
     first_points = research.reserch_user(get_user_id)
     second_points = research.reserch_user2(get_user_id)
 
-    ret = f'🆔 ID: {get_user_id}\n1️⃣Очки за 1 сезон: {first_points}\n2️⃣Очки за 2 сезон: {second_points}\n📅Следующий запрос: через {time_now}' '''
-
+    ret = f'🆔 ID: {get_user_id}\n1️⃣Очки за 1 сезон: {first_points}\n2️⃣Очки за 2 сезон: {second_points}\n📅Следующий запрос: через {time_hours} часов {time_minutes} минут' 
+    return ret
 
 
 
@@ -209,10 +211,13 @@ file = open('proxys')
 prox = file.readline()
 db.create_tables([Person, Timeframe, SecondSeason])
 
-'''@root.message_handler(commands=['profile'])
+@root.message_handler(commands=['profile'])
 def profile(message):
     try:
-        h'''
+        h = profile1(message)
+        root.reply_to(message, f"👤 <b>Профиль</b>\n\n{h}")
+    except Exception as e:
+        print(e)
 
 
 
@@ -284,7 +289,7 @@ def address(message):
                             
                             if research.reserch_user(message_id) != None:
                                 root.reply_to(message,
-                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
+                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запросц",
                                       parse_mode='HTML')
                             else:
                                 root.reply_to(message,
