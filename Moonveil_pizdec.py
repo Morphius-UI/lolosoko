@@ -152,15 +152,35 @@ def profile1(message):
          time_now = int(time.time())
          whole_second = user_next_send - time_now
          if whole_second > 0:
-            time_now = datetime.timedelta(whole_second)
+            time_now = str(datetime.timedelta(seconds=whole_second))
             time_hours = time_now.split(':')[0]
             time_minutes = time_now.split(':')[1]
+    def glagol():
+        if time_hours == 1:
+            glag = ' час '
+        if time_hours == 2 or time_hours == 3 or time_hours == 4 or time_hours == 21 or time_hours == 22 or time_hours == 23:
+            glag = ' часа '
+        else:
+            glag = ' часов '
+        return glag
 
+    def glagol1():
+        if int(time_minutes)%10==0:
+            minu = ' минут '
+        if int(time_minutes)%10==1 and int(time_minutes)!=11:
+            minu = ' минуту '
+        if 5 <= int(time_minutes) <= 20:
+            minu = ' минут '
+        if int(time_minutes)%10==5 or int(time_minutes)%10==6 or int(time_minutes)%10==7 or int(time_minutes)%10==8 or int(time_minutes)%10==9:
+            minu = ' минут '
+        else:
+            minu = ' минуты '
+        return minu
 
     first_points = research.reserch_user(get_user_id)
     second_points = research.reserch_user2(get_user_id)
 
-    ret = f'🆔 ID: {get_user_id}\n1️⃣Очки за 1 сезон: {first_points}\n2️⃣Очки за 2 сезон: {second_points}\n📅Следующий запрос: через {time_hours} часов {time_minutes} минут' 
+    ret = f'🆔 ID {get_user_id}\n1️⃣Запросов 1 сезон: {first_points}\n2️⃣Запросов 2 сезон: {second_points}\n\nСледующий запрос: через {time_hours} {glagol()} {time_minutes} {glagol1()}' 
     return ret
 
 
