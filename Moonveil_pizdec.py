@@ -6,7 +6,7 @@ import random
 import requests
 import re
 from peewee import *
-from datetime import date
+import datetime
 import calendar
 import threading
 from web3 import Web3
@@ -143,6 +143,26 @@ class SecondSeason(Model):
         database = db
 
 
+'''def profile1(message):
+    get_user_id = message.from_user.id
+    for time in SecondSeason.select().where(SecondSeason.userId == get_user_id):
+        user_next_send = time.nextsend
+
+    if user_next_send != None:
+         time_now = int(time.time())
+         whole_second = user_next_send - time_now
+         if whole_second > 0:
+            time_now = datetime.timedelta(whole_second)
+
+
+    first_points = research.reserch_user(get_user_id)
+    second_points = research.reserch_user2(get_user_id)
+
+    ret = f'🆔 ID: {get_user_id}\n1️⃣Очки за 1 сезон: {first_points}\n2️⃣Очки за 2 сезон: {second_points}\n📅Следующий запрос: через {time_now}' '''
+
+
+
+
 def leaderboard1(message):
     f = ''
     chat_id = message.chat.id
@@ -189,6 +209,12 @@ file = open('proxys')
 prox = file.readline()
 db.create_tables([Person, Timeframe, SecondSeason])
 
+'''@root.message_handler(commands=['profile'])
+def profile(message):
+    try:
+        h'''
+
+
 
 @root.message_handler(commands=['leaderboard'])
 def leaderboard2(message):
@@ -222,7 +248,7 @@ def address(message):
                             SecondSeason.create(userId=message_id, lastsend=calendar.timegm(time.gmtime()),
                                      nextsend=calendar.timegm(time.gmtime()) + 86400, point1=point1, point2=1)
                             root.reply_to(message,
-                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос\n\n<b>🎁 Первый сезон завершён!</b> <a href='https://t.me/moonveil_workshop/12494/21253'>Заберите награду до 24.03»</a>",
+                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
                                       parse_mode='HTML')
                         else:
                             SecondSeason.create(userId=message_id, lastsend=calendar.timegm(time.gmtime()),
@@ -244,7 +270,7 @@ def address(message):
                                              nextsend=calendar.timegm(time.gmtime()) + 86400, userId=int(message_id))
                             if research.reserch_user(message_id) != None:
                                 root.reply_to(message,
-                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос\n\n<b>🎁 Первый сезон завершён!</b> <a href='https://t.me/moonveil_workshop/12494/21253'>Заберите награду до 24.03 »</a>",
+                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
                                       parse_mode='HTML')
                             else:
                                 root.reply_to(message,
@@ -258,7 +284,7 @@ def address(message):
                             
                             if research.reserch_user(message_id) != None:
                                 root.reply_to(message,
-                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос\n\n<b>🎁 Первый сезон завершён!</b> <a href='https://t.me/moonveil_workshop/12494/21253'>Заберите награду до 24.03 »</a>",
+                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
                                       parse_mode='HTML')
                             else:
                                 root.reply_to(message,
