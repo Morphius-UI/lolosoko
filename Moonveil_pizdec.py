@@ -79,13 +79,15 @@ class research:
     def reserch_user2(userId):
         for user in SecondSeason.select().where(SecondSeason.userId == userId):
             return user.point2
-
+    def reserch_user3(userId):
+        for user in SecondSeason.select().where(SecondSeason.userId == userId):
+            return user.point1
     def nextdata(userId):
         for user in SecondSeason.select().where(SecondSeason.userId == userId):
             return user.nextsend
 
     def delandcreat(userId):
-        point1 = research.reserch_user(userId)
+        point1 = research.reserch_user3(userId)
         point2 = research.reserch_user2(userId)
         print(point1, point2)
         obj = SecondSeason.get(SecondSeason.userId == userId)
@@ -145,20 +147,25 @@ class SecondSeason(Model):
 
 def profile1(message):
     get_user_id = message.from_user.id
-    for time in SecondSeason.select().where(SecondSeason.userId == get_user_id):
-        user_next_send = time.nextsend
-
-    if user_next_send != None:
+    def next_send():
+        for user in Timeframe.select().where(Timeframe.userId == get_user_id):
+            return user.nextsend
+    if next_send() != None:
+         user_next_send = next_send()
          time_now = int(time.time())
          whole_second = user_next_send - time_now
          if whole_second > 0:
             time_now = str(datetime.timedelta(seconds=whole_second))
             time_hours = time_now.split(':')[0]
             time_minutes = time_now.split(':')[1]
+         else:
+            pass
+    else:
+        whole_second = -1
     def glagol():
         if time_hours == 1:
             glag = ' час '
-        if time_hours == 2 or time_hours == 3 or time_hours == 4 or time_hours == 21 or time_hours == 22 or time_hours == 23:
+        elif time_hours == 2 or time_hours == 3 or time_hours == 4 or time_hours == 21 or time_hours == 22 or time_hours == 23:
             glag = ' часа '
         else:
             glag = ' часов '
@@ -167,20 +174,27 @@ def profile1(message):
     def glagol1():
         if int(time_minutes)%10==0:
             minu = ' минут '
-        if int(time_minutes)%10==1 and int(time_minutes)!=11:
+        elif int(time_minutes)%10==1 and int(time_minutes)!=11:
             minu = ' минуту '
-        if 5 <= int(time_minutes) <= 20:
+        elif 5 <= int(time_minutes) <= 20:
             minu = ' минут '
-        if int(time_minutes)%10==5 or int(time_minutes)%10==6 or int(time_minutes)%10==7 or int(time_minutes)%10==8 or int(time_minutes)%10==9:
+        elif int(time_minutes)%10==5 or int(time_minutes)%10==6 or int(time_minutes)%10==7 or int(time_minutes)%10==8 or int(time_minutes)%10==9:
             minu = ' минут '
         else:
             minu = ' минуты '
+        
         return minu
 
     first_points = research.reserch_user(get_user_id)
     second_points = research.reserch_user2(get_user_id)
-
-    ret = f'🆔 ID {get_user_id}\n1️⃣Запросов 1 сезон: {first_points}\n2️⃣Запросов 2 сезон: {second_points}\n\nСледующий запрос: через {time_hours} {glagol()} {time_minutes} {glagol1()}' 
+    if first_points == None:
+        first_points = 0
+    if second_points == None:
+        second_points = 0
+    if whole_second > 0:
+        ret = f'🆔 ID {get_user_id}\n1️⃣ Запросов 1 сезон: {first_points}\n2️⃣ Запросов 2 сезон: {second_points}\n\nСледующий запрос: через {time_hours}{glagol()}{time_minutes}{glagol1()}'
+    else:
+        ret = f'🆔 ID {get_user_id}\n1️⃣ Запросов 1 сезон: {first_points}\n2️⃣ Запросов 2 сезон: {second_points}\n\nСледующий запрос уже доступен, скорее запрашивайте!'  
     return ret
 
 
@@ -235,7 +249,7 @@ db.create_tables([Person, Timeframe, SecondSeason])
 def profile(message):
     try:
         h = profile1(message)
-        root.reply_to(message, f"👤 <b>Профиль</b>\n\n{h}")
+        root.reply_to(message, f"👤 <b>Профиль</b>\n\n{h}", parse_mode='HTML')
     except Exception as e:
         print(e)
 
@@ -293,7 +307,7 @@ def address(message):
                             research.povrors(message_id)
                             Timeframe.create(lastsend=calendar.timegm(time.gmtime()),
                                              nextsend=calendar.timegm(time.gmtime()) + 86400, userId=int(message_id))
-                            if research.reserch_user(message_id) != None:
+                            if research.reserch_user3(message_id) != None:
                                 root.reply_to(message,
                                       f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
                                       parse_mode='HTML')
@@ -307,7 +321,7 @@ def address(message):
                             break
                         else:
                             
-                            if research.reserch_user(message_id) != None:
+                            if research.reserch_user3(message_id) != None:
                                 root.reply_to(message,
                                       f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запросц",
                                       parse_mode='HTML')
