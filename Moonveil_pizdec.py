@@ -216,7 +216,7 @@ def leaderboard1(message):
             kol = person.point2
             after += 1
             continue
-        f = f + str(k) + f'. @{UsrInfo} — ' + str(person.point2) + ' запрос.\n'
+        f = f + str(k) + f'. {UsrInfo} — ' + str(person.point2) + ' запрос.\n'
 
     if after != 0:
         f += f'+{str(after)} пользователей с {kol} запросами'
@@ -230,9 +230,13 @@ def print_numbers():
         for user in Timeframe.select():
             userId = user.userId
             if user.nextsend <= calendar.timegm(time.gmtime()):
-                UsrInfo = root.get_chat_member(userId, userId).user.username
-                text = randomfr(UsrInfo)
-                root.send_message(chat, f"{text}", message_thread_id=thread_id)
+                print('lesha')
+                try:
+                    UsrInfo = root.get_chat_member(userId, userId).user.username
+                    text = randomfr(UsrInfo)
+                    root.send_message(chat, f"{text}", message_thread_id=thread_id)
+                except:
+                    pass
                 q = Timeframe.delete().where(Timeframe.userId == userId)
                 q.execute()
         time.sleep(60)
@@ -274,7 +278,7 @@ def address(message):
         print(message_id)
         address = message.text
         trueadd = web3(str(address))
-        for i in range(4):
+        for i in range(10):
             result = MoonveilFaucet(proxy=prox, address=trueadd)
             more = result.classic()
             if more != 'invalid address':
@@ -287,7 +291,7 @@ def address(message):
                             SecondSeason.create(userId=message_id, lastsend=calendar.timegm(time.gmtime()),
                                      nextsend=calendar.timegm(time.gmtime()) + 86400, point1=point1, point2=1)
                             root.reply_to(message,
-                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
+                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user3(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
                                       parse_mode='HTML')
                         else:
                             SecondSeason.create(userId=message_id, lastsend=calendar.timegm(time.gmtime()),
@@ -309,7 +313,7 @@ def address(message):
                                              nextsend=calendar.timegm(time.gmtime()) + 86400, userId=int(message_id))
                             if research.reserch_user3(message_id) != None:
                                 root.reply_to(message,
-                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
+                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user3(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
                                       parse_mode='HTML')
                             else:
                                 root.reply_to(message,
@@ -323,7 +327,7 @@ def address(message):
                             
                             if research.reserch_user3(message_id) != None:
                                 root.reply_to(message,
-                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запросц",
+                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user3(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
                                       parse_mode='HTML')
                             else:
                                 root.reply_to(message,
