@@ -74,47 +74,71 @@ class MoonveilFaucet:
 class research:
     def reserch_user(userId):
         for user in Person.select().where(Person.userId == userId):
-            return user.point
+            if not None:
+                return user.point
+            else:
+                return 0
 
     def reserch_user2(userId):
         for user in SecondSeason.select().where(SecondSeason.userId == userId):
-            return user.point2
+            if not None:
+                return user.point2
+            else:
+                return 0
+
+    def research_3(userId):
+        for user in ThreeSeason.select().where(ThreeSeason.userId == userId):
+            if not None:
+                return user.point3
+            else:
+                return 0
+    
     def reserch_user3(userId):
         for user in SecondSeason.select().where(SecondSeason.userId == userId):
             return user.point1
+
+    def get_true_3(userId):
+        for user in ThreeSeason.select().where(ThreeSeason.userId == userId):
+            return user.userId
+
+    
     def nextdata(userId):
         for user in SecondSeason.select().where(SecondSeason.userId == userId):
             return user.nextsend
 
     def delandcreat(userId):
-        point1 = research.reserch_user3(userId)
+        point1 = research.reserch_user(userId)
         point2 = research.reserch_user2(userId)
+        point3 = research.research_3(userId)
         print(point1, point2)
-        obj = SecondSeason.get(SecondSeason.userId == userId)
+        obj = ThreeSeason.get(ThreeSeason.userId == userId)
         print(obj)
         if obj != None:
             print("afafaf")
             obj.delete_instance()
-            SecondSeason.create(userId=userId, lastsend=calendar.timegm(time.gmtime()),
-                      nextsend=calendar.timegm(time.gmtime()) + 86400, point1=point1, point2=point2+1)
+            ThreeSeason.create(userId=userId, lastsend=calendar.timegm(time.gmtime()),
+                      nextsend=calendar.timegm(time.gmtime()) + 86400, point1=point1, point2=point2, point3=point3+1)
         else:
             print('sex')
-            SecondSeason.create(userId=userId, lastsend=calendar.timegm(time.gmtime()),
-                      nextsend=calendar.timegm(time.gmtime()) + 86400, point1=point1, point2=point2+1)
+            ThreeSeason.create(userId=userId, lastsend=calendar.timegm(time.gmtime()),
+                      nextsend=calendar.timegm(time.gmtime()) + 86400, point1=point1, point2=point2, point3=point3+1)
 
 
 
     def povrors(userId):
         h = []
-        for person in SecondSeason.select().where(SecondSeason.userId == userId):
+        for person in ThreeSeason.select().where(ThreeSeason.userId == userId):
             h.append(person.userId)
             if len(h) > 1:
-                obj = SecondSeason.get(SecondSeason.userId == userId)
+                obj = ThreeSeason.get(ThreeSeason.userId == userId)
                 obj.delete_instance()
 
     def firstseason(userId):
         for person in Person.select().where(Person.userId == userId):
-            return person.point
+            if not None:
+                return person.point
+            else:
+                return 0
 
 
 class Person(Model):
@@ -141,6 +165,18 @@ class SecondSeason(Model):
     nextsend = IntegerField()
     point1 = IntegerField()
     point2 = IntegerField()
+    class Meta:
+        database = db
+
+
+class ThreeSeason(Model):
+    userId = IntegerField()
+    lastsend = IntegerField()
+    nextsend = IntegerField()
+    point1 = IntegerField()
+    point2 = IntegerField()
+    point3 = IntegerField()
+
     class Meta:
         database = db
 
@@ -187,14 +223,11 @@ def profile1(message):
 
     first_points = research.reserch_user(get_user_id)
     second_points = research.reserch_user2(get_user_id)
-    if first_points == None:
-        first_points = 0
-    if second_points == None:
-        second_points = 0
+    three_points = research.research_3(get_user_id)
     if whole_second > 0:
-        ret = f'🆔 ID {get_user_id}\n1️⃣ Запросов 1 сезон: {first_points}\n2️⃣ Запросов 2 сезон: {second_points}\n\nСледующий запрос: через {time_hours}{glagol()}{time_minutes}{glagol1()}'
+        ret = f'🆔 ID {get_user_id}\n1️⃣ Запросов 1 сезон: {str(first_points)}\n2️⃣ Запросов 2 сезон: {str(second_points)}\n3⃣ Запросов 3 сезон: {str(three_points)}\n\nСледующий запрос: через {time_hours}{glagol()}{time_minutes}{glagol1()}'
     else:
-        ret = f'🆔 ID {get_user_id}\n1️⃣ Запросов 1 сезон: {first_points}\n2️⃣ Запросов 2 сезон: {second_points}\n\nСледующий запрос уже доступен, скорее запрашивайте!'  
+        ret = f'🆔 ID {get_user_id}\n1️⃣ Запросов 1 сезон: {first_points}\n2️⃣ Запросов 2 сезон: {second_points}\n3⃣ Запросов 3 сезон: {str(three_points)}\n\nСледующий запрос уже доступен, скорее запрашивайте!'  
     return ret
 
 
@@ -205,18 +238,18 @@ def leaderboard1(message):
     k = 0
     after = 0
     undo = []
-    for person in SecondSeason.select().order_by(SecondSeason.point2.desc()):
+    for person in ThreeSeason.select().order_by(ThreeSeason.point2.desc()):
         k += 1
         userId = person.userId
         UsrInfo = root.get_chat_member(chat_id, userId).user.username
-        undo.append(person.point2)
+        undo.append(person.point3)
         if k >= 11 and undo[k - 1] != undo[k - 2]:
             break
         if k >= 11 and undo[k - 1] == undo[k - 2]:
-            kol = person.point2
+            kol = person.point3
             after += 1
             continue
-        f = f + str(k) + f'. {UsrInfo} — ' + str(person.point2) + ' запрос.\n'
+        f = f + str(k) + f'. {UsrInfo} — ' + str(person.point3) + ' запрос.\n'
 
     if after != 0:
         f += f'+{str(after)} пользователей с {kol} запросами'
@@ -247,7 +280,7 @@ thread.start()
 
 file = open('proxys')
 prox = file.readline()
-db.create_tables([Person, Timeframe, SecondSeason])
+db.create_tables([Person, Timeframe, SecondSeason, ThreeSeason])
 
 @root.message_handler(commands=['profile'])
 def profile(message):
@@ -279,31 +312,21 @@ def address(message):
         address = message.text
         trueadd = web3(str(address))
         for i in range(10):
-            result = MoonveilFaucet(proxy=prox, address=trueadd)
+            result = MoonveilFaucet(proxy='http://k9lja62yos:Te5Sl6k9HXoQoRMx@89.39.105.245:23750', address=trueadd)
             more = result.classic()
             if more != 'invalid address':
                 if more.split()[0] == "Txhash:":
-                    print(research.reserch_user2(message_id))
-                    if research.reserch_user2(message_id) == None:
+                    if research.get_true_3(message_id) == None:
                         g = research.firstseason(message_id)
-                        if g!=None:
-                            point1 = g
-                            SecondSeason.create(userId=message_id, lastsend=calendar.timegm(time.gmtime()),
-                                     nextsend=calendar.timegm(time.gmtime()) + 86400, point1=point1, point2=1)
-                            root.reply_to(message,
-                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user3(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
-                                      parse_mode='HTML')
-                        else:
-                            SecondSeason.create(userId=message_id, lastsend=calendar.timegm(time.gmtime()),
-                                     nextsend=calendar.timegm(time.gmtime()) + 86400, point1=0, point2=1)
-                            root.reply_to(message,
-                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: 0 запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
-                                      parse_mode='HTML')
-                            
+                        gg = research.reserch_user2(message_id)
+                        point1 = g
+                        ThreeSeason.create(userId=message_id, lastsend=calendar.timegm(time.gmtime()),
+                                nextsend=calendar.timegm(time.gmtime()) + 86400, point1=point1, point2=gg,point3=1)
+                        root.reply_to(message,
+                                f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос\n3⃣ Третий: {str(research.research_3(message_id))} запрос",
+                                parse_mode='HTML')
                         Timeframe.create(lastsend=calendar.timegm(time.gmtime()),
                                          nextsend=calendar.timegm(time.gmtime()) + 86400, userId=int(message_id))
-
-
                         break
                     else:
                         if research.nextdata(message_id) <= calendar.timegm(time.gmtime()):
@@ -311,30 +334,15 @@ def address(message):
                             research.povrors(message_id)
                             Timeframe.create(lastsend=calendar.timegm(time.gmtime()),
                                              nextsend=calendar.timegm(time.gmtime()) + 86400, userId=int(message_id))
-                            if research.reserch_user3(message_id) != None:
-                                root.reply_to(message,
-                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user3(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
-                                      parse_mode='HTML')
-                            else:
-                                root.reply_to(message,
-                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: 0 запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
-                                      parse_mode='HTML')
-
-
-
+                            root.reply_to(message,
+                                f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос\n3⃣ Третий: {str(research.research_3(message_id))} запрос",
+                                parse_mode='HTML')
                             break
                         else:
-                            
                             if research.reserch_user3(message_id) != None:
                                 root.reply_to(message,
-                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user3(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
+                                f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: {str(research.reserch_user(message_id))} запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос\n3⃣ Третий: {str(research.research_3(message_id))} запрос",
                                       parse_mode='HTML')
-                            else:
-                                root.reply_to(message,
-                                      f"<b>✅ Токены успешно отправлены на указанный адрес!</b>\n\nТранзакция: <a href='https://blockscout.testnet.moonveil.gg/tx/{more.split()[1]}'>Moonveil Explorer»</a>\n\n<b>💎 Статистика по сезонам</b>\n1⃣ Первый: 0 запрос\n2⃣ Второй: {str(research.reserch_user2(message_id))} запрос",
-                                      parse_mode='HTML')
-
-
                             break
                 if more.split()[0] != "Txhash":
                     continue
