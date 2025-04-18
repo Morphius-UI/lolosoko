@@ -73,24 +73,36 @@ class MoonveilFaucet:
 
 class research:
     def reserch_user(userId):
+        s = None
         for user in Person.select().where(Person.userId == userId):
-            s = user.point
+            if user:
+                s = user.point
+            else:
+                pass
         if s != None:
             return s
         else:
             return 0
 
     def reserch_user2(userId):
+        s = None
         for user in SecondSeason.select().where(SecondSeason.userId == userId):
-            s = user.point2
+            if user:
+                s = user.point2
+            else:
+                pass
         if s != None:
             return s
         else:
             return 0
 
     def research_3(userId):
+        s = None
         for user in ThreeSeason.select().where(ThreeSeason.userId == userId):
-            s = user.point3
+            if user:
+                s = user.point3
+            else:
+                pass
         if s != None:
             return s
         else:
