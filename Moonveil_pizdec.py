@@ -82,7 +82,7 @@ class research:
 
     def reserch_user2(userId):
         for user in SecondSeason.select().where(SecondSeason.userId == userId):
-            s = user.point
+            s = user.point2
         if s != None:
             return s
         else:
@@ -90,7 +90,7 @@ class research:
 
     def research_3(userId):
         for user in ThreeSeason.select().where(ThreeSeason.userId == userId):
-            s = user.point
+            s = user.point3
         if s != None:
             return s
         else:
