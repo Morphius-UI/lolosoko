@@ -255,7 +255,7 @@ def leaderboard1(message):
         f = f + str(k) + f'. {UsrInfo} — ' + str(person.point3) + ' запрос.\n'
 
     if after != 0:
-        f += f'+{str(after)} пользователей с {kol} запросами'
+        f += f'+{str(after)} пользователей с {kol} запросами.'
         return f
     else:
         return f
