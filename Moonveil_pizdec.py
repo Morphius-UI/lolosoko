@@ -14,8 +14,8 @@ from web3 import Web3
 Token = '7734870298:AAHcEohsz-0fdZRKndROLTLUcnWIS1vwuA0'
 root = telebot.TeleBot(Token)
 
-chat = -1002364115755
-thread_id = 12494
+#chat = -1002364115755
+#thread_id = 12494
 
 k = 0
 db = SqliteDatabase('fofa.sqlite')
@@ -74,24 +74,27 @@ class MoonveilFaucet:
 class research:
     def reserch_user(userId):
         for user in Person.select().where(Person.userId == userId):
-            if not None:
-                return user.point
-            else:
-                return 0
+            s = user.point
+        if s != None:
+            return s
+        else:
+            return 0
 
     def reserch_user2(userId):
         for user in SecondSeason.select().where(SecondSeason.userId == userId):
-            if not None:
-                return user.point2
-            else:
-                return 0
+            s = user.point
+        if s != None:
+            return s
+        else:
+            return 0
 
     def research_3(userId):
         for user in ThreeSeason.select().where(ThreeSeason.userId == userId):
-            if not None:
-                return user.point3
-            else:
-                return 0
+            s = user.point
+        if s != None:
+            return s
+        else:
+            return 0
     
     def reserch_user3(userId):
         for user in SecondSeason.select().where(SecondSeason.userId == userId):
@@ -238,7 +241,7 @@ def leaderboard1(message):
     k = 0
     after = 0
     undo = []
-    for person in ThreeSeason.select().order_by(ThreeSeason.point2.desc()):
+    for person in ThreeSeason.select().order_by(ThreeSeason.point3.desc()):
         k += 1
         userId = person.userId
         UsrInfo = root.get_chat_member(chat_id, userId).user.username
